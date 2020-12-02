@@ -232,7 +232,9 @@ class resnet(_FPN):
       state_dict = torch.load(self.model_path)
       resnet.load_state_dict({k:v for k,v in state_dict.items() if k in resnet.state_dict()})
 
-    self.RCNN_layer0 = nn.Sequential(resnet.conv1, resnet.bn1, resnet.relu, resnet.maxpool)
+    self.input_conv = nn.Conv2d(cfg.INPUT_CHANNEL, 3, (1, 1))
+
+    self.RCNN_layer0 = nn.Sequential(self.input_conv, resnet.conv1, resnet.bn1, resnet.relu, resnet.maxpool)
     self.RCNN_layer1 = nn.Sequential(resnet.layer1)
     self.RCNN_layer2 = nn.Sequential(resnet.layer2)
     self.RCNN_layer3 = nn.Sequential(resnet.layer3)

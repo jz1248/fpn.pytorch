@@ -142,12 +142,15 @@ if __name__ == '__main__':
     'faster_rcnn_{}_{}_{}.pth'.format(args.checksession, args.checkepoch, args.checkpoint))
 
 
+  # classes = np.asarray(['__background__',
+  #                      'aeroplane', 'bicycle', 'bird', 'boat',
+  #                      'bottle', 'bus', 'car', 'cat', 'chair',
+  #                      'cow', 'diningtable', 'dog', 'horse',
+  #                      'motorbike', 'person', 'pottedplant',
+  #                      'sheep', 'sofa', 'train', 'tvmonitor'])
   classes = np.asarray(['__background__',
-                       'aeroplane', 'bicycle', 'bird', 'boat',
-                       'bottle', 'bus', 'car', 'cat', 'chair',
-                       'cow', 'diningtable', 'dog', 'horse',
-                       'motorbike', 'person', 'pottedplant',
-                       'sheep', 'sofa', 'train', 'tvmonitor'])
+                        'zhufang', 'changfang', 'dapeng', 'qita1', 'qita2'])
+
 
   fasterRCNN = _fasterRCNN(args.net, classes)
   checkpoint = torch.load(load_name)
