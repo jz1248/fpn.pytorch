@@ -10,7 +10,7 @@
 import numpy as np
 #from scipy.misc import imread, imresize
 import cv2
-
+from model.utils.config import cfg
 
 
 def im_list_to_blob(ims):
@@ -20,10 +20,12 @@ def im_list_to_blob(ims):
     """
     max_shape = np.array([im.shape for im in ims]).max(axis=0)
     num_images = len(ims)
-    blob = np.zeros((num_images, max_shape[0], max_shape[1], 3),
+    blob = np.zeros((num_images, max_shape[0], max_shape[1], cfg.INPUT_CHANNEL),
                     dtype=np.float32)
     for i in xrange(num_images):
         im = ims[i]
+        if len(im.shape) == 2:
+            im = np.expand_dims(im, axis=2)
         blob[i, 0:im.shape[0], 0:im.shape[1], :] = im
 
     return blob
