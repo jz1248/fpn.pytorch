@@ -383,7 +383,7 @@ if __name__ == '__main__':
       num_iter += 1
 
 
-    if epoch % 5 == 0:
+    if epoch % 1 == 0:
         if args.mGPUs:
           save_name = os.path.join(output_dir, 'fpn_{}_{}_{}.pth'.format(args.session, epoch, num_iter))
           save_checkpoint({
