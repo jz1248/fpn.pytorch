@@ -307,6 +307,7 @@ if __name__ == '__main__':
 
   iters_per_epoch = int(train_size / args.batch_size)
 
+  num_iter = 0
   for epoch in range(args.start_epoch, args.max_epochs):
     # setting to train mode
     FPN.train()
@@ -333,7 +334,7 @@ if __name__ == '__main__':
 
       loss = rpn_loss_cls.mean() + rpn_loss_box.mean() \
            + RCNN_loss_cls.mean() + RCNN_loss_bbox.mean()
-      loss_temp += loss.data[0]
+      loss_temp += loss.data.item()
 
       # backward
       optimizer.zero_grad()
@@ -346,17 +347,17 @@ if __name__ == '__main__':
           loss_temp /= args.disp_interval
 
         if args.mGPUs:
-          loss_rpn_cls = rpn_loss_cls.mean().data[0]
-          loss_rpn_box = rpn_loss_box.mean().data[0]
-          loss_rcnn_cls = RCNN_loss_cls.mean().data[0]
-          loss_rcnn_box = RCNN_loss_bbox.mean().data[0]
+          loss_rpn_cls = rpn_loss_cls.mean().data.item()
+          loss_rpn_box = rpn_loss_box.mean().data.item()
+          loss_rcnn_cls = RCNN_loss_cls.mean().data.item()
+          loss_rcnn_box = RCNN_loss_bbox.mean().data.item()
           fg_cnt = torch.sum(roi_labels.data.ne(0))
           bg_cnt = roi_labels.data.numel() - fg_cnt
         else:
-          loss_rpn_cls = RCNN_rpn.rpn_loss_cls.data[0]
-          loss_rpn_box = RCNN_rpn.rpn_loss_box.data[0]
-          loss_rcnn_cls = RCNN_loss_cls.data[0]
-          loss_rcnn_box = RCNN_loss_bbox.data[0]
+          loss_rpn_cls = rpn_loss_cls.data.item()
+          loss_rpn_box = rpn_loss_box.data.item()
+          loss_rcnn_cls = RCNN_loss_cls.data.item()
+          loss_rcnn_box = RCNN_loss_bbox.data.item()
           fg_cnt = torch.sum(roi_labels.data.ne(0))
           bg_cnt = roi_labels.data.numel() - fg_cnt
 
@@ -374,14 +375,17 @@ if __name__ == '__main__':
             'loss_rcnn_box': loss_rcnn_box,
           }
           for tag, value in info.items():
-            logger.scalar_summary(tag, value, step)
+            logger.scalar_summary(tag, value, num_iter)
 
         loss_temp = 0
         start = time.time()
+      
+      num_iter += 1
+
 
     if epoch % 5 == 0:
         if args.mGPUs:
-          save_name = os.path.join(output_dir, 'fpn_{}_{}_{}.pth'.format(args.session, epoch, step))
+          save_name = os.path.join(output_dir, 'fpn_{}_{}_{}.pth'.format(args.session, epoch, num_iter))
           save_checkpoint({
             'session': args.session,
             'epoch': epoch + 1,
@@ -391,7 +395,7 @@ if __name__ == '__main__':
             'class_agnostic': args.class_agnostic,
           }, save_name)
         else:
-          save_name = os.path.join(output_dir, 'fpn_{}_{}_{}.pth'.format(args.session, epoch, step))
+          save_name = os.path.join(output_dir, 'fpn_{}_{}_{}.pth'.format(args.session, epoch, num_iter))
           save_checkpoint({
             'session': args.session,
             'epoch': epoch + 1,

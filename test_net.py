@@ -53,7 +53,7 @@ def parse_args():
                       help='set config keys', default=None,
                       nargs=argparse.REMAINDER)
   parser.add_argument('--load_dir', dest='load_dir',
-                      help='directory to load models', default="/srv/share/jyang375/models",
+                      help='directory to load models', default="models",
                       nargs=argparse.REMAINDER)
   parser.add_argument('--cuda', dest='cuda',
                       help='whether use CUDA',
@@ -253,7 +253,8 @@ if __name__ == '__main__':
           # Simply repeat the boxes, once for each class
           pred_boxes = boxes
 
-      pred_boxes /= data[1][0][2]
+      # pred_boxes = pred_boxes.cpu()
+      pred_boxes /= data[1].cuda()[0][2]
 
       scores = scores.squeeze()
       pred_boxes = pred_boxes.squeeze()
@@ -274,6 +275,7 @@ if __name__ == '__main__':
             else:
               cls_boxes = pred_boxes[inds][:, j * 4:(j + 1) * 4]
 
+            cls_scores = torch.unsqueeze(cls_scores, 1)
             cls_dets = torch.cat((cls_boxes, cls_scores), 1)
             cls_dets = cls_dets[order]
             keep = nms(cls_dets, cfg.TEST.NMS)
